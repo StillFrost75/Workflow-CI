@@ -49,24 +49,24 @@ mlflow.sklearn.autolog()
 
 print("Mulai training model basic (Pure Autolog)...")
 
-with mlflow.start_run(run_name="Basic_Training_Autolog_Only"):
-    
+
+def train_model(X_train, y_train, X_test, y_test, n_estimators=100, random_state=42):
+    """Latih RandomForest dan kembalikan model beserta akurasi test."""
     # Inisialisasi Model
-    rf = RandomForestClassifier(n_estimators=100, random_state=42)
-    
+    rf = RandomForestClassifier(n_estimators=n_estimators, random_state=random_state)
+
     # Proses Training (Fit)
-    # Di sinilah MAGIC autolog bekerja. Dia akan otomatis mencatat:
-    # - Parameters (n_estimators, random_state, dll)
-    # - Metrics (Training score)
-    # - Artifacts (Model.pkl, conda.yaml, MLmodel)
     rf.fit(X_train, y_train)
-    
-    # Evaluasi (Opsional, hanya untuk print di terminal)
-    # Autolog biasanya otomatis menghitung metrics training, 
-    # tapi untuk test metrics kadang perlu manual atau eval_and_log_metrics.
-    # Namun untuk syarat 'Basic', kode di atas sudah cukup memicu autolog.
+
+    # Evaluasi pada test set
     y_pred = rf.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
     print(f"Akurasi: {acc:.4f}")
-    
-    print("Selesai. Semua log ditangani otomatis oleh MLflow Autolog.")
+
+    print("Selesai. MLflow Autolog akan mencatat params/metrics/artifact secara otomatis.")
+    return rf, acc
+
+
+if __name__ == "__main__":
+    # Jalankan training saat script dieksekusi langsung (mis. di runner / lokal)
+    model, accuracy = train_model(X_train, y_train, X_test, y_test)
