@@ -4,7 +4,9 @@ conda_env: conda.yaml
 
 entry_points:
   main:
-    command: "python modelling.py"
-  
-  tuning:
-    command: "python modelling_tuning.py"
+    parameters:
+      C: {type: float, default: 0.1}
+      solver: {type: string, default: "lbfgs"}
+      max_iter: {type: int, default: 100}
+      dataset : {type: string, default: "heartdisease_preprocessing/train_processed.csv"}
+    command: "python modelling.py {C} {solver} {max_iter} {dataset}"
