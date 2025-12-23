@@ -6,21 +6,34 @@ import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-# ==============================================================================
-# 1. SETUP PATH & LOAD DATA
-# ==============================================================================
+# ============================================================================
+# 1. SETUP PATH & LOAD DATA (LOAD PROCESSED CSVs)
+# ============================================================================
 current_dir = os.path.dirname(os.path.abspath(__file__))
-preprocessing_dir = os.path.join(current_dir, '..', 'preprocessing')
-sys.path.append(preprocessing_dir)
+# data folder inside this project
+data_dir = os.path.join(current_dir, 'heartdisease_preprocessing')
+train_csv = os.path.join(data_dir, 'train_processed.csv')
+test_csv = os.path.join(data_dir, 'test_processed.csv')
 
-try:
-    from automate_RadityaAtharIlazuard import load_data, preprocess_data
-except ImportError:
-    sys.exit("Gagal import automate script.")
+# Validate files exist
+if not os.path.exists(train_csv) or not os.path.exists(test_csv):
+    sys.exit(f"File train/test CSV tidak ditemukan di: {data_dir}")
 
-data_path = os.path.join(current_dir, '..', 'heart_disease_uci_raw', 'heart.csv')
-df = load_data(data_path)
-X_train, X_test, y_train, y_test, preprocessor = preprocess_data(df)
+print(f"Loading train data from: {train_csv}")
+print(f"Loading test data from : {test_csv}")
+
+df_train = pd.read_csv(train_csv)
+df_test = pd.read_csv(test_csv)
+
+# Dataset sudah diproses (one-hot, scaling, dst.) — target di kolom 'num'
+target_col = 'num'
+if target_col not in df_train.columns or target_col not in df_test.columns:
+    sys.exit(f"Kolom target '{target_col}' tidak ditemukan di CSV")
+
+X_train = df_train.drop(columns=[target_col])
+y_train = df_train[target_col].astype(int)
+X_test = df_test.drop(columns=[target_col])
+y_test = df_test[target_col].astype(int)
 
 # ==============================================================================
 # 2. EXPERIMENT SETUP
