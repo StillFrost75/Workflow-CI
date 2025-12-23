@@ -30,7 +30,7 @@ jobs:
     - name: Run Model Training (Skilled)
       run: |
         cd MLProject
-        mlflow run . --entry-point tuning --env-manager=local
+        mlflow run . --entry-point main --env-manager=local
 
     # 5. Upload Artifacts: Simpan hasil training
     - name: Upload MLflow Results
